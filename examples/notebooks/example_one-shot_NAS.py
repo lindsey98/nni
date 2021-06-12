@@ -109,25 +109,25 @@ class Net(nn.Module):
             i, j, k = comb
             layer_choices.append(
                 nn.Sequential(
-                        ('cnn1_conv', nn.Conv2d(3, i, 3, 1, 1)),
-                        ('cnn1_batchnorm', nn.BatchNorm2d(i)),
-                        ('cnn1_relu', nn.ReLU(inplace=True)),
-                        ('cnn1_pool', nn.MaxPool2d(2)),
+                        nn.Conv2d(3, i, 3, 1, 1),
+                        nn.BatchNorm2d(i),
+                        nn.ReLU(inplace=True),
+                        nn.MaxPool2d(2),
 
-                        ('cnn2_conv', nn.Conv2d(i, j, 3, 1, 1)),
-                        ('cnn2_batchnorm', nn.BatchNorm2d(j)),
-                        ('cnn2_relu', nn.ReLU(inplace=True)),
-                        ('cnn2_pool', nn.MaxPool2d(2)),
+                        nn.Conv2d(i, j, 3, 1, 1),
+                        nn.BatchNorm2d(j),
+                        nn.ReLU(inplace=True),
+                        nn.MaxPool2d(2),
 
-                        ('cnn3_conv', nn.Conv2d(j, k, 3, 1, 1)),
-                        ('cnn3_batchnorm', nn.BatchNorm2d(k)),
-                        ('cnn3_relu', nn.ReLU(inplace=True)),
-                        ('cnn3_pool', nn.MaxPool2d(2)),
+                        nn.Conv2d(j, k, 3, 1, 1),
+                        nn.BatchNorm2d(k),
+                        nn.ReLU(inplace=True),
+                        nn.MaxPool2d(2),
 
-                        ('dense_fc1', nn.Conv2d(k * 4 * 4, 32, kernel_size=1, bias=True)),
+                        nn.Conv2d(k * 4 * 4, 32, kernel_size=1, bias=True),
                         # implement dense layer in CNN way
-                        ('dense_relu', nn.ReLU(inplace=True)),
-                        ('dense_fc2', nn.Conv2d(32, self.head_size, kernel_size=1, bias=True)),
+                        nn.ReLU(inplace=True),
+                        nn.Conv2d(32, self.head_size, kernel_size=1, bias=True),
                     )
             )
         return layer_choices
@@ -149,8 +149,13 @@ model.forward(torch.rand(1, 3, 32, 32))
 criterion = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 
-transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
-train_dataset = CIFAR10(root="./data", train=True, download=True, transform=transform)
+transform = transforms.Compose([transforms.ToTensor(),
+                                transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),])
+
+train_dataset = CIFAR10(root="./data",
+                        train=True,
+                        download=True,
+                        transform=transform)
 
 trainer = DartsTrainer(
     model=model,
@@ -159,8 +164,8 @@ trainer = DartsTrainer(
     optimizer=optimizer,
     num_epochs=2,
     dataset=train_dataset,
-    batch_size=64,
-    log_frequency=10
+    batch_size=256,
+    log_frequency=10,
 )
 
 trainer.fit()
