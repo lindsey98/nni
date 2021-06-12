@@ -124,17 +124,17 @@ class Net(nn.Module):
                         nn.ReLU(inplace=True),
                         nn.MaxPool2d(2),
 
-                        nn.Conv2d(k * 4 * 4, 32, kernel_size=1, bias=True),
-                        # implement dense layer in CNN way
+                        nn.AdaptiveAvgPool2d((4, 4)),
+                        nn.Linear(k * 4 * 4, 32,  bias=True),
                         nn.ReLU(inplace=True),
-                        nn.Conv2d(32, self.head_size, kernel_size=1, bias=True),
+                        nn.Linear(32, self.head_size,  bias=True),
                     )
             )
         return layer_choices
 
     def forward(self, x):
-
-        return x
+        out = self.net(x)
+        return out
 
 
 model = Net()
